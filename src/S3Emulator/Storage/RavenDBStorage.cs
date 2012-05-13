@@ -40,8 +40,11 @@ namespace S3Emulator.Storage
       using (var session = documentStore.OpenSession())
       {
         var bucket = session.Load<Bucket>(bucketName);
-        session.Delete(bucket);
-        session.SaveChanges();
+        if(bucket != null)
+        {
+          session.Delete(bucket);
+          session.SaveChanges();  
+        }
       }
     }
 
@@ -74,9 +77,12 @@ namespace S3Emulator.Storage
       using (var session = documentStore.OpenSession())
       {
         var s3Object = session.Load<S3Object>(bucket + "/" + key);
-        var attachment = session.Advanced.DatabaseCommands.GetAttachment(s3Object.Id);
-        s3Object.Content = attachment.Data;
-
+        if(s3Object != null)
+        {
+          var attachment = session.Advanced.DatabaseCommands.GetAttachment(s3Object.Id);
+          s3Object.Content = attachment.Data;  
+        }
+        
         return s3Object;
       }
     }
@@ -86,9 +92,12 @@ namespace S3Emulator.Storage
       using (var session = documentStore.OpenSession())
       {
         var s3Object = session.Load<S3Object>(bucket + "/" + key);
-        session.Advanced.DatabaseCommands.DeleteAttachment(s3Object.Id, null);
-        session.Delete(s3Object);
-        session.SaveChanges();
+        if (s3Object != null)
+        {
+          session.Advanced.DatabaseCommands.DeleteAttachment(s3Object.Id, null);
+          session.Delete(s3Object);
+          session.SaveChanges();
+        }
       }
     }
 
