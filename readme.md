@@ -18,7 +18,7 @@ Supported Operations
 
 How to use it ?
 ---------------
-Download the application from [here][1]. Open a command promt window and just enter "S3Emulator"  
+Download the application from [here][1]. Open a command promt window and just enter : "S3Emulator"  
 When started with default options, all the requests made to "s3.amazonaws.com" will be redirected to S3Emulator.  
 You can see the full list of options by entering : "S3Emulator -help"  
 
@@ -37,8 +37,8 @@ Options
   Default: 8878  
 
 - EnableProxy  
-  Proxy is used for redirecting requests to S3Emulator's http listener and supporting [subdomain style bucket names][2]. 
-  If you disable proxy, you need to use Request-URI syle bucket names. 
+  Proxy is used for redirecting requests to S3Emulator's http listener and supporting [subdomain style bucket names][2].  
+  If you disable proxy, you need to use Request-URI syle bucket names.  
   [FiddlerCore][3] is used for proxy operations.  
   Default: true  
 	
