@@ -17,9 +17,8 @@ namespace S3Emulator
       optionSet = new OptionSet
       {
         {"service=", "Set S3 service address (default: s3.amazonaws.com)", key => s3Configuration.ServiceUrl = key},
-        {"host=", "Set host name (default: localhost)", key => s3Configuration.Host = key},
         {"hostport=", "Set host port (default: 8878)", key => s3Configuration.HostPort = Convert.ToInt32(key)},
-        {"enableproxy=", "Enable/Disable proxying (default: true)", key => s3Configuration.IsProxyEnabled = Convert.ToBoolean(key)},
+        {"proxy=", "Enable/Disable proxying (default: true)", key => s3Configuration.IsProxyEnabled = Convert.ToBoolean(key)},
         {"proxyport=", "Set proxy port (default: 8877)", key => s3Configuration.ProxyPort = Convert.ToInt32(key)},
         {"directory=", "Data directory (default: ~\\Data)", key => s3Configuration.DataDirectory = key},
         {"inmemory=", "Use in memory storage (default: false)", key => s3Configuration.RunInMemory = Convert.ToBoolean(key)},
@@ -49,7 +48,6 @@ namespace S3Emulator
       var s3Configuration = new S3Configuration
       {
         ServiceUrl = "s3.amazonaws.com",
-        Host = "localhost",
         HostPort = 8878,
         ProxyPort = 8877,
         IsProxyEnabled = true,
@@ -73,14 +71,8 @@ namespace S3Emulator
       using (var s3Server = new S3Server(s3Configuration))
       {
         s3Server.Start();
-
         Console.WriteLine("S3Emulator is started");
-        Console.WriteLine("Listening connections at '{0}:{1}'", s3Configuration.Host, s3Configuration.HostPort);
-        if (s3Configuration.IsProxyEnabled)
-        {
-          Console.WriteLine("Proxy is enabled");
-          Console.WriteLine("Requests for '{0}' will be redirected to '{1}:{2}'", s3Configuration.ServiceUrl, s3Configuration.Host, s3Configuration.HostPort);
-        }
+        Console.WriteLine("Service url : {0}", s3Configuration.ServiceUrl);
         Console.WriteLine("Press <Enter> to stop");
         Console.ReadLine();
       }

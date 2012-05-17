@@ -11,7 +11,6 @@ namespace S3Emulator.Server
 {
   public class Bootstrapper : DefaultNancyBootstrapper, IDisposable
   {
-
     private readonly S3Configuration s3Configuration;
     private readonly IDocumentStore documentStore;
 

@@ -16,7 +16,6 @@ namespace S3Emulator.Server
     private enum CtrlType
     {
       CTRL_C_EVENT = 0,
-      CTRL_BREAK_EVENT = 1,
       CTRL_CLOSE_EVENT = 2,
       CTRL_LOGOFF_EVENT = 5,
       CTRL_SHUTDOWN_EVENT = 6
@@ -38,20 +37,26 @@ namespace S3Emulator.Server
     {
       if (s3Configuration.IsProxyEnabled)
       {
-        FiddlerApplication.BeforeRequest += VirtualHostedToPathStyleBucketName;
+        FiddlerApplication.BeforeRequest += InterceptRequest;
         FiddlerApplication.Startup(s3Configuration.ProxyPort, FiddlerCoreStartupFlags.Default);
       }
 
-      var uri = new Uri(string.Format("http://{0}:{1}", s3Configuration.Host, s3Configuration.HostPort));
+      var uri = new Uri(string.Format("http://127.0.0.1:{0}", s3Configuration.HostPort));
       bootstrapper = new Bootstrapper(s3Configuration);
       nancyHost = new NancyHost(bootstrapper, uri);
       nancyHost.Start();
     }
 
-    private void VirtualHostedToPathStyleBucketName(Session session)
+    private void InterceptRequest(Session session)
     {
       if (!session.hostname.EndsWith(s3Configuration.ServiceUrl))
       {
+        return;
+      }
+
+      if (session.HTTPMethodIs("CONNECT"))
+      {
+        session.oFlags["x-replywithtunnel"] = "fake tunnel";
         return;
       }
 
@@ -62,7 +67,11 @@ namespace S3Emulator.Server
         bucket = "/" + virtualHostedPath;
       }
 
-      session.host = string.Format("{0}:{1}", s3Configuration.Host, s3Configuration.HostPort);
+      if(session.isHTTPS)
+      {
+        session.fullUrl = session.fullUrl.Replace("https", "http"); 
+      }      
+      session.host = string.Format("127.0.0.1:{0}", s3Configuration.HostPort);
       session.PathAndQuery = string.Format("{0}{1}", bucket, session.PathAndQuery);
     }
 

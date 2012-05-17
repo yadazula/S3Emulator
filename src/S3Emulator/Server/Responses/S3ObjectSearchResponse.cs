@@ -11,6 +11,7 @@ namespace S3Emulator.Server.Responses
     public int? MaxKeys { get; set; }
     public string Prefix { get; set; }
     public bool IsTruncated { get; set; }
-    public IEnumerable<S3Object> S3Objects { get; set; }
+    public IList<S3Object> S3Objects { get; set; }
+    public IList<string> Prefixes { get; set; }
   }
 }

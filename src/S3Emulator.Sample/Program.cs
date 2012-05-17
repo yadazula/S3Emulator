@@ -20,6 +20,7 @@ namespace S3Emulator.Sample
     private const string AwsSecretAccessKey = "bar";
     private const string Bucket = "bucket1";
     private const string S3ObjectKey = "key1";
+    private const Protocol Protocoll = Protocol.HTTPS;
 
     static void Main()
     {
@@ -61,7 +62,6 @@ namespace S3Emulator.Sample
       var s3Configuration = new S3Configuration
       {
         ServiceUrl = ServiceUrl,
-        Host = "localhost",
         HostPort = HostPort,
         ProxyPort = ProxyPort,
         IsProxyEnabled = IsProxyEnabled,
@@ -77,8 +77,8 @@ namespace S3Emulator.Sample
     private static AmazonS3 CreateS3Client()
     {
       var config = new AmazonS3Config()
-                      .WithCommunicationProtocol(Protocol.HTTP)
-                      .WithServiceURL(ServiceUrl + ":" + HostPort);
+                      .WithCommunicationProtocol(Protocoll)
+                      .WithServiceURL(ServiceUrl);
 
       var client = AWSClientFactory.CreateAmazonS3Client(AwsAccessKey, AwsSecretAccessKey, config);
       return client;

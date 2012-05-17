@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Raven.Client;
 using Raven.Json.Linq;
 using S3Emulator.Model;
@@ -40,10 +41,10 @@ namespace S3Emulator.Storage
       using (var session = documentStore.OpenSession())
       {
         var bucket = session.Load<Bucket>(bucketName);
-        if(bucket != null)
+        if (bucket != null)
         {
           session.Delete(bucket);
-          session.SaveChanges();  
+          session.SaveChanges();
         }
       }
     }
@@ -77,12 +78,12 @@ namespace S3Emulator.Storage
       using (var session = documentStore.OpenSession())
       {
         var s3Object = session.Load<S3Object>(bucket + "/" + key);
-        if(s3Object != null)
+        if (s3Object != null)
         {
           var attachment = session.Advanced.DatabaseCommands.GetAttachment(s3Object.Id);
-          s3Object.Content = attachment.Data;  
+          s3Object.Content = attachment.Data;
         }
-        
+
         return s3Object;
       }
     }
@@ -111,7 +112,8 @@ namespace S3Emulator.Storage
         MaxKeys = searchRequest.MaxKeys,
         Prefix = searchRequest.Prefix,
         IsTruncated = false,
-        S3Objects = new List<S3Object>()
+        S3Objects = new List<S3Object>(),
+        Prefixes = new List<string>()
       };
 
       var bucket = GetBucket(searchRequest.BucketName);
@@ -120,29 +122,57 @@ namespace S3Emulator.Storage
         return searchResponse;
       }
 
-      var s3Objects = QueryS3Objects(searchRequest);
-      searchResponse.S3Objects = s3Objects;
+      QueryS3Objects(searchRequest, searchResponse);
 
       return searchResponse;
     }
 
-    private IEnumerable<S3Object> QueryS3Objects(S3ObjectSearchRequest searchRequest)
+    private void QueryS3Objects(S3ObjectSearchRequest searchRequest, S3ObjectSearchResponse searchResponse)
     {
       using (var session = documentStore.OpenSession())
       {
-        var query = session.Advanced.LuceneQuery<S3Object, S3Object_Search>();
+        var objectsQuery = session.Advanced.LuceneQuery<S3Object, S3Object_Search>();
 
         if (!string.IsNullOrWhiteSpace(searchRequest.Prefix))
         {
-          var whereClause = string.Format("Key:{0}*", searchRequest.Prefix);
-          query = query.Where(whereClause);
+          objectsQuery.Where(string.Format("Key:{0}*", searchRequest.Prefix));
         }
 
-        var result = query.Take(searchRequest.MaxKeys ?? 1000)
-                          .WaitForNonStaleResultsAsOfNow()
-                          .ToList();
-        return result;
+        searchResponse.S3Objects = objectsQuery.Take(searchRequest.MaxKeys ?? 1000)
+                                               .WaitForNonStaleResultsAsOfNow()
+                                               .ToList();
       }
+
+      if (!string.IsNullOrWhiteSpace(searchRequest.Delimiter))
+      {
+        ApplyDelimiterFilter(searchRequest, searchResponse);
+      }
+    }
+
+    private void ApplyDelimiterFilter(S3ObjectSearchRequest searchRequest, S3ObjectSearchResponse searchResponse)
+    {
+      IList<string> prefixStrings = new List<string>();
+      IList<S3Object> objectsToRemove = new List<S3Object>();
+      foreach (var s3Object in searchResponse.S3Objects)
+      {
+        var match = Regex.Match(s3Object.Key,
+                                string.Format("({0}.*?{1}).*?", searchRequest.Prefix, searchRequest.Delimiter));
+        if (!match.Success) continue;
+
+        var @group = match.Groups[0].Value;
+        if (!prefixStrings.Contains(@group))
+        {
+          prefixStrings.Add(@group);
+        }
+        objectsToRemove.Add(s3Object);
+      }
+
+      foreach (var s3Object in objectsToRemove)
+      {
+        searchResponse.S3Objects.Remove(s3Object);
+      }
+
+      searchResponse.Prefixes = prefixStrings;
     }
   }
 }

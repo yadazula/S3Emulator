@@ -27,38 +27,34 @@ Options
 - Service  
   Address of s3 service that will be emulated.  
   Default: s3.amazonaws.com  
-
-- Host  
-  The hostname to use for the http listener.  
-  Default: localhost  
-
-- HostPort  
-  The port to use for the http listener.  
-  Default: 8878  
-
-- EnableProxy  
-  Proxy is used for redirecting requests to S3Emulator's http listener and supporting [subdomain style bucket names][2].  
-  If you disable proxy, you need to use Request-URI syle bucket names.  
-  [FiddlerCore][3] is used for proxy operations.  
+  
+- Proxy  
+  Proxy is used for supporting secure connections and [subdomain style bucket names][2].  
+  If you disable proxy, you need to use http protocol and request-uri syle bucket names.  
+  [FiddlerCore][3] is used for proxy support.  
   Default: true  
-	
+  
 - ProxyPort  
   The port to use for the proxy.  
   Default: 8877  
-
+  
+- HostPort  
+  The port to use for the S3Emulator's http listener.  
+  Default: 8878  
+  
 - Directory  
   The directory for the storage operations.  
   [RavenDB][4] is used for persistance.  
   Default: ~\Data  
-
+  
 - InMemory  
   If set to true, all storage operations will be in memory.  
   Default: false  
-
+  
 - MaxBPS  
   Set maximum bytes per second. Can be used for bandwidth throttling.  
   Default: infinite  
-
+  
 [0]: http://github.com/yadazula/S3Emulator "S3Emulator on Github"
 [1]: http://github.com/yadazula/S3Emulator/downloads "download"
 [2]: http://docs.amazonwebservices.com/AmazonS3/latest/dev/VirtualHosting.html#VirtualHostingSpecifyBucket

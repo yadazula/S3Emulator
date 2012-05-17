@@ -3,7 +3,6 @@
   public class S3Configuration
   {
     public string ServiceUrl { get; set; }
-    public string Host { get; set; }
     public int HostPort { get; set; }
     public int ProxyPort { get; set; }
     public bool IsProxyEnabled { get; set; }

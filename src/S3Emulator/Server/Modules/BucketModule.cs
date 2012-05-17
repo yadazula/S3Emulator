@@ -2,6 +2,7 @@
 using Nancy;
 using S3Emulator.Model;
 using S3Emulator.Server.Responses;
+using S3Emulator.Server.Responses.Serializers;
 using S3Emulator.Storage;
 
 namespace S3Emulator.Server.Modules
@@ -43,6 +44,12 @@ namespace S3Emulator.Server.Modules
       if (method.ToUpperInvariant() == "HEAD")
       {
         return CheckBucketExist(bucket);
+      }
+
+      if (Request.Url.Query == "?acl")
+      {
+        var response = responder.Respond(new ACLRequest());
+        return response;
       }
 
       return ListObjects(bucket);

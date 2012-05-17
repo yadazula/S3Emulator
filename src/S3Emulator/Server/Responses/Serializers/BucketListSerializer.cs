@@ -25,7 +25,7 @@ namespace S3Emulator.Server.Responses.Serializers
             buckets.Bucket(DynamicXmlBuilder.Fragment(bucket =>
             {
               bucket.Name(item.Id);
-              bucket.CreationDate(item.CreationDate.ToString("o"));
+              bucket.CreationDate(item.CreationDate.ToUTC());
             }));
           }
         }));

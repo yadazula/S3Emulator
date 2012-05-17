@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Xml.Serialization;
 using Nancy;
 using S3Emulator.Config;
 using S3Emulator.IO;
@@ -13,19 +14,40 @@ namespace S3Emulator.Server.Modules
   {
     private readonly S3Configuration configuration;
     private readonly IS3Storage storage;
+    private readonly IS3Responder responder;
 
     public S3ObjectModule(S3Configuration configuration, IS3Storage storage, IS3Responder responder)
     {
       this.configuration = configuration;
       this.storage = storage;
+      this.responder = responder;
 
       Get["/{bucket}/{key}"] = x => GetObject(x.bucket, x.key);
       Put["/{bucket}/{key}"] = x => AddObject(x.bucket, x.key, Request.Body);
       Delete["/{bucket}/{key}"] = x => DeleteObject(x.bucket, x.key);
+      Post["/{bucket}"] = x => CheckDelete(x.bucket);
+    }
+
+    private Response CheckDelete(string bucket)
+    {
+      if (Request.Url.Query == "?delete")
+      {
+        var serializer = new XmlSerializer(typeof(DeleteRequest));
+        var deleteRequest = (DeleteRequest)serializer.Deserialize(Request.Body);
+        DeleteObject(bucket, deleteRequest.Object.Key);
+      }
+
+      var response = new Response { StatusCode = HttpStatusCode.NoContent };
+      return response;
     }
 
     private Response AddObject(string bucket, string key, Stream stream)
     {
+      if (Request.Url.Query == "?acl")
+      {
+        return new Response { StatusCode = HttpStatusCode.OK };
+      }
+
       var content = stream.Copy(configuration.MaxBytesPerSecond);
 
       var s3Object = new S3Object

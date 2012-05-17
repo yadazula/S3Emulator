@@ -1,8 +1,9 @@
 ﻿using System.Xml;
+using S3Emulator.Model;
 
 namespace S3Emulator.Server.Responses.Serializers
 {
-  public class S3ObjectSearchResponeSerializer : AbstractS3Serializer<S3ObjectSearchResponse>
+  public class S3ObjectSearchSerializer : AbstractS3Serializer<S3ObjectSearchResponse>
   {
     protected override string SerializeInternal(S3ObjectSearchResponse searchResponse)
     {
@@ -15,22 +16,29 @@ namespace S3Emulator.Server.Responses.Serializers
         list.Marker(searchResponse.Marker);
         list.MaxKeys(searchResponse.MaxKeys);
         list.IsTruncated(XmlConvert.ToString(searchResponse.IsTruncated));
-        list.Contents(DynamicXmlBuilder.Fragment(contents =>
+        foreach (var s3Object in searchResponse.S3Objects)
         {
-          foreach (var s3Object in searchResponse.S3Objects)
+          S3Object o = s3Object;
+          list.Contents(DynamicXmlBuilder.Fragment(contents =>
           {
-            contents.Key(s3Object.Key);
-            contents.LastModifed(s3Object.CreationDate.ToString("o"));
-            contents.ETag(string.Format("\"{0}\"", s3Object.ContentMD5));
-            contents.Size(s3Object.Size);
+            contents.Key(o.Key);
+            contents.LastModifed(o.CreationDate.ToUTC());
+            contents.ETag(string.Format("\"{0}\"", o.ContentMD5));
+            contents.Size(o.Size);
             contents.StorageClass("STANDARD");
             contents.Owner(DynamicXmlBuilder.Fragment(owner =>
             {
               owner.ID("id");
               owner.DisplayName("name");
             }));
-          }
-        }));
+          }));
+        }
+
+        foreach (var prefix in searchResponse.Prefixes)
+        {
+          string prefix1 = prefix;
+          list.CommonPrefixes(DynamicXmlBuilder.Fragment(cp => cp.Prefix(prefix1)));
+        }
       }));
 
       var responseBody = builder.ToString(false);

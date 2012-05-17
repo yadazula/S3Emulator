@@ -17,7 +17,7 @@ namespace S3Emulator.Tests.Server.Responses
       Assert.IsType<BucketListSerializer>(serializer);
 
       serializer = s3XmlResponder.PublicGetSerializer(new S3ObjectSearchResponse());
-      Assert.IsType<S3ObjectSearchResponeSerializer>(serializer);
+      Assert.IsType<S3ObjectSearchSerializer>(serializer);
       
       serializer = s3XmlResponder.PublicGetSerializer(new BucketNotFound());
       Assert.IsType<BucketNotFoundSerializer>(serializer);

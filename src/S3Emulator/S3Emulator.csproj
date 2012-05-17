@@ -125,10 +125,14 @@
   <ItemGroup>
     <Compile Include="Config\S3Configuration.cs" />
     <Compile Include="Server\Modules\ServiceModule.cs" />
+    <Compile Include="Server\Responses\DeleteRequest.cs" />
     <Compile Include="Server\Responses\S3ObjectSearchResponse.cs" />
     <Compile Include="Server\Responses\BucketNotFound.cs" />
     <Compile Include="Server\Responses\Serializers\AbstractS3Serializer.cs" />
+    <Compile Include="Server\Responses\ACLRequest.cs" />
+    <Compile Include="Server\Responses\Serializers\ACLSerializer.cs" />
     <Compile Include="Server\Responses\Serializers\BucketNotFoundSerializer.cs" />
+    <Compile Include="Server\Responses\Serializers\DateTimeExtensions.cs" />
     <Compile Include="Server\Responses\Serializers\NullSerializer.cs" />
     <Compile Include="Server\Responses\Serializers\S3ObjectSearchResponeSerializer.cs" />
     <Compile Include="Storage\Indexes\S3Object_Search.cs" />
@@ -159,6 +163,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="makecert.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

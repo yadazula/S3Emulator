@@ -20,10 +20,13 @@ namespace S3Emulator.Server.Responses
         return new BucketListSerializer();
 
       if (o is S3ObjectSearchResponse)
-        return new S3ObjectSearchResponeSerializer();
+        return new S3ObjectSearchSerializer();
 
       if (o is BucketNotFound)
         return new BucketNotFoundSerializer();
+
+      if (o is ACLRequest)
+        return new ACLSerializer();
 
       return new NullSerializer();
     }
