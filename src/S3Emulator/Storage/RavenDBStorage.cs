@@ -131,16 +131,15 @@ namespace S3Emulator.Storage
     {
       using (var session = documentStore.OpenSession())
       {
-        var objectsQuery = session.Advanced.LuceneQuery<S3Object, S3Object_Search>();
+        var query = string.IsNullOrWhiteSpace(searchRequest.Prefix) ? string.Format("Bucket:{0}", searchRequest.BucketName) :
+                                                                      string.Format("Bucket:{0} AND Key:{1}*", searchRequest.BucketName, searchRequest.Prefix);
 
-        if (!string.IsNullOrWhiteSpace(searchRequest.Prefix))
-        {
-          objectsQuery.Where(string.Format("Key:{0}*", searchRequest.Prefix));
-        }
-
-        searchResponse.S3Objects = objectsQuery.Take(searchRequest.MaxKeys ?? 1000)
-                                               .WaitForNonStaleResultsAsOfNow()
-                                               .ToList();
+        searchResponse.S3Objects = session.Advanced
+                                          .LuceneQuery<S3Object, S3Object_Search>()
+                                          .Where(query)
+                                          .Take(searchRequest.MaxKeys ?? 1000)
+                                          .WaitForNonStaleResultsAsOfNow()
+                                          .ToList();
       }
 
       if (!string.IsNullOrWhiteSpace(searchRequest.Delimiter))
@@ -148,7 +147,7 @@ namespace S3Emulator.Storage
         ApplyDelimiterFilter(searchRequest, searchResponse);
       }
     }
-
+ 
     private void ApplyDelimiterFilter(S3ObjectSearchRequest searchRequest, S3ObjectSearchResponse searchResponse)
     {
       IList<string> prefixStrings = new List<string>();

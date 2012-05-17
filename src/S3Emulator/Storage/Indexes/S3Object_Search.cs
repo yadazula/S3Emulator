@@ -9,7 +9,11 @@ namespace S3Emulator.Storage.Indexes
     public S3Object_Search()
     {
       Map = s3Objects => from s3Object in s3Objects
-                         select new { s3Object.Key };
+                         select new
+                          {
+                            s3Object.Bucket, 
+                            s3Object.Key
+                          };
     }
   }
 }
