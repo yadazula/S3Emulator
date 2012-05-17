@@ -9,18 +9,6 @@ namespace S3Emulator.Server
 {
   public class S3Server : IDisposable
   {
-    [DllImport("Kernel32")]
-    private static extern bool SetConsoleCtrlHandler(ConsoleEventHandler handler, bool add);
-    private delegate bool ConsoleEventHandler(CtrlType sig);
-    private readonly ConsoleEventHandler handler;
-    private enum CtrlType
-    {
-      CTRL_C_EVENT = 0,
-      CTRL_CLOSE_EVENT = 2,
-      CTRL_LOGOFF_EVENT = 5,
-      CTRL_SHUTDOWN_EVENT = 6
-    }
-
     private readonly S3Configuration s3Configuration;
     private NancyHost nancyHost;
     private Bootstrapper bootstrapper;
@@ -28,9 +16,6 @@ namespace S3Emulator.Server
     public S3Server(S3Configuration s3Configuration)
     {
       this.s3Configuration = s3Configuration;
-      
-      handler += OnConsoleEvent;
-      SetConsoleCtrlHandler(handler, true);
     }
 
     public void Start()
@@ -88,21 +73,6 @@ namespace S3Emulator.Server
 
       if (nancyHost != null)
         nancyHost.Stop();
-    }
-
-    private bool OnConsoleEvent(CtrlType signal)
-    {
-      switch (signal)
-      {
-        case CtrlType.CTRL_C_EVENT:
-        case CtrlType.CTRL_LOGOFF_EVENT:
-        case CtrlType.CTRL_SHUTDOWN_EVENT:
-        case CtrlType.CTRL_CLOSE_EVENT:
-          Dispose();
-          break;
-      }
-
-      return true;
     }
   }
 }

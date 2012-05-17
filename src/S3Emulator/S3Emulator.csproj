@@ -124,6 +124,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\S3Configuration.cs" />
+    <Compile Include="ConsoleEventListener.cs" />
     <Compile Include="Server\Modules\ServiceModule.cs" />
     <Compile Include="Server\Responses\DeleteRequest.cs" />
     <Compile Include="Server\Responses\S3ObjectSearchResponse.cs" />

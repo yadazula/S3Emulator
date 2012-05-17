@@ -8,8 +8,12 @@ namespace S3Emulator
 {
   class Program
   {
+    internal static S3Server S3Server;
+
     static void Main(string[] args)
     {
+      ConsoleEventListener.Listen();
+
       var s3Configuration = GetDefaultConfiguration();
       var shouldStartServer = true;
 
@@ -68,9 +72,9 @@ namespace S3Emulator
 
     private static void StartServer(S3Configuration s3Configuration)
     {
-      using (var s3Server = new S3Server(s3Configuration))
+      using (S3Server = new S3Server(s3Configuration))
       {
-        s3Server.Start();
+        S3Server.Start();
         Console.WriteLine("S3Emulator is started");
         Console.WriteLine("Service url : {0}", s3Configuration.ServiceUrl);
         Console.WriteLine("Press <Enter> to stop");
