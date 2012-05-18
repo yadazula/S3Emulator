@@ -14,13 +14,11 @@ namespace S3Emulator.Server.Modules
   {
     private readonly S3Configuration configuration;
     private readonly IS3Storage storage;
-    private readonly IS3Responder responder;
 
-    public S3ObjectModule(S3Configuration configuration, IS3Storage storage, IS3Responder responder)
+    public S3ObjectModule(S3Configuration configuration, IS3Storage storage)
     {
       this.configuration = configuration;
       this.storage = storage;
-      this.responder = responder;
 
       Get["/{bucket}/{key}"] = x => GetObject(x.bucket, x.key);
       Put["/{bucket}/{key}"] = x => AddObject(x.bucket, x.key, Request.Body);

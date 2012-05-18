@@ -22,7 +22,7 @@ namespace S3Emulator.Server.Responses.Serializers
           list.Contents(DynamicXmlBuilder.Fragment(contents =>
           {
             contents.Key(o.Key);
-            contents.LastModifed(o.CreationDate.ToUTC());
+            contents.LastModified(o.CreationDate.ToUTC());
             contents.ETag(string.Format("\"{0}\"", o.ContentMD5));
             contents.Size(o.Size);
             contents.StorageClass("STANDARD");

@@ -1,7 +1,5 @@
 S3Emulator
 ==============
-[http://github.com/yadazula/S3Emulator][0]  
-
 S3Emulator is a lightweight server which mimics the services of Amazon S3. It can be useful for development and testing porpuses. 
 By reducing network traffic, it saves both the time and the money.
 
