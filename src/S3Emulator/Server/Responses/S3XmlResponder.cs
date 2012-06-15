@@ -1,12 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Nancy;
-using S3Emulator.Model;
 using S3Emulator.Server.Responses.Serializers;
 
 namespace S3Emulator.Server.Responses
 {
   public class S3XmlResponder : IS3Responder
   {
+    private readonly IDictionary<Type, IS3Serializer> serializers;
+
+    public S3XmlResponder(IDictionary<Type, IS3Serializer> serializers)
+    {
+      this.serializers = serializers;
+    }
+
     public Response Respond<T>(T t)
     {
       var serializer = GetSerializer(t);
@@ -14,21 +21,10 @@ namespace S3Emulator.Server.Responses
       return response;
     }
 
-    protected IS3Serializer GetSerializer(object o)
+    public IS3Serializer GetSerializer(object o)
     {
-      if (o is IEnumerable<Bucket>)
-        return new BucketListSerializer();
-
-      if (o is S3ObjectSearchResponse)
-        return new S3ObjectSearchSerializer();
-
-      if (o is BucketNotFound)
-        return new BucketNotFoundSerializer();
-
-      if (o is ACLRequest)
-        return new ACLSerializer();
-
-      return new NullSerializer();
+      var type = o.GetType();
+      return serializers.ContainsKey(type) ? serializers[type] : new NullSerializer();
     }
   }
 }

@@ -127,6 +127,7 @@
     <Compile Include="ConsoleEventListener.cs" />
     <Compile Include="Server\Modules\ServiceModule.cs" />
     <Compile Include="Server\Responses\DeleteRequest.cs" />
+    <Compile Include="Server\Responses\Serializers\DeleteResultSerializer.cs" />
     <Compile Include="Server\Responses\S3ObjectSearchResponse.cs" />
     <Compile Include="Server\Responses\BucketNotFound.cs" />
     <Compile Include="Server\Responses\Serializers\AbstractS3Serializer.cs" />

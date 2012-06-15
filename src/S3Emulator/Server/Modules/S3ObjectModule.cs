@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Xml.Serialization;
 using Nancy;
@@ -14,11 +15,13 @@ namespace S3Emulator.Server.Modules
   {
     private readonly S3Configuration configuration;
     private readonly IS3Storage storage;
+    private readonly IS3Responder responder;
 
-    public S3ObjectModule(S3Configuration configuration, IS3Storage storage)
+    public S3ObjectModule(S3Configuration configuration, IS3Storage storage, IS3Responder responder)
     {
       this.configuration = configuration;
       this.storage = storage;
+      this.responder = responder;
 
       Get["/{bucket}/{key}"] = x => GetObject(x.bucket, x.key);
       Put["/{bucket}/{key}"] = x => AddObject(x.bucket, x.key, Request.Body);
@@ -32,7 +35,8 @@ namespace S3Emulator.Server.Modules
       {
         var serializer = new XmlSerializer(typeof(DeleteRequest));
         var deleteRequest = (DeleteRequest)serializer.Deserialize(Request.Body);
-        DeleteObject(bucket, deleteRequest.Object.Key);
+        storage.DeleteObject(bucket, deleteRequest.Object.Key);
+        return responder.Respond(deleteRequest);
       }
 
       var response = new Response { StatusCode = HttpStatusCode.NoContent };

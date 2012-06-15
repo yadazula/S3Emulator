@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Nancy;
 using Raven.Client;
 using Raven.Client.Embedded;
 using S3Emulator.Config;
+using S3Emulator.Model;
 using S3Emulator.Server.Responses;
+using S3Emulator.Server.Responses.Serializers;
 using S3Emulator.Storage;
 using S3Emulator.Storage.Indexes;
 
@@ -32,7 +35,24 @@ namespace S3Emulator.Server
       container.Register(documentStore);
       container.Register(s3Configuration);
       container.Register<IS3Storage, RavenDBStorage>().AsSingleton();
-      container.Register<IS3Responder, S3XmlResponder>().AsSingleton();
+      
+      var s3Responder = BuildResponder();
+      container.Register(s3Responder);
+    }
+
+    public static IS3Responder BuildResponder()
+    {
+      var s3Serializers = new Dictionary<Type, IS3Serializer>
+      {
+        {typeof (List<Bucket>), new BucketListSerializer()},
+        {typeof (S3ObjectSearchResponse), new S3ObjectSearchSerializer()},
+        {typeof (BucketNotFound), new BucketNotFoundSerializer()},
+        {typeof (ACLRequest), new ACLSerializer()},
+        {typeof (DeleteRequest), new DeleteResultSerializer()}
+      };
+
+      IS3Responder s3Responder = new S3XmlResponder(s3Serializers);
+      return s3Responder;
     }
 
     public void Dispose()

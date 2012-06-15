@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using Fiddler;
 using Nancy.Hosting.Self;
@@ -22,7 +21,7 @@ namespace S3Emulator.Server
     {
       if (s3Configuration.IsProxyEnabled)
       {
-        FiddlerApplication.BeforeRequest += InterceptRequest;
+        FiddlerApplication.BeforeRequest += BeforeRequest;
         FiddlerApplication.Startup(s3Configuration.ProxyPort, FiddlerCoreStartupFlags.Default);
       }
 
@@ -32,7 +31,7 @@ namespace S3Emulator.Server
       nancyHost.Start();
     }
 
-    private void InterceptRequest(Session session)
+    private void BeforeRequest(Session session)
     {
       if (!session.hostname.EndsWith(s3Configuration.ServiceUrl))
       {
